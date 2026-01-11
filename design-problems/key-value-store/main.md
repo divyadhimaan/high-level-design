@@ -265,15 +265,15 @@ value).
 
 ## Summary
 
-| Goal/Problems                | Technique                                               |
-|-------------------------------|--------------------------------------------------------|
-| Ability to store big data     | Use consistent hashing to spread the load across servers |
-| High availability reads       | Data replication, Multi-data center setup              |
-| Highly available writes       | Versioning and conflict resolution with vector clocks  |
-| Dataset partition             | Consistent Hashing                                     |
-| Incremental scalability       | Consistent Hashing                                     |
-| Heterogeneity                 | Consistent Hashing                                     |
-| Tunable consistency           | Quorum consensus                                       |
-| Handling temporary failures   | Sloppy quorum and hinted handoff                       |
-| Handling permanent failures   | Merkle tree                                            |
-| Handling data center outage   | Cross-data center replication                          |
+| Goal/Problems               | Technique                                                |
+|-----------------------------|----------------------------------------------------------|
+| Ability to store big data   | Use consistent hashing to spread the load across servers |
+| High availability reads     | Data replication, Multi-data center setup                |
+| Highly available writes     | Versioning and conflict resolution with vector clocks    |
+| Dataset partition           | Consistent Hashing                                       |
+| Incremental scalability     | Consistent Hashing                                       |
+| Heterogeneity               | Consistent Hashing                                       |
+| Tunable consistency         | Quorum consensus                                         |
+| Handling temporary failures | Sloppy quorum and hinted handoff                         |
+| Handling permanent failures | Merkle tree                                              |
+| Handling data center outage | Cross-data center replication                            |
