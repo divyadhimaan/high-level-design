@@ -182,6 +182,13 @@ Refer [here](./../../Readme.md#cap-theorem-brewers-theorem)
   node is labeled with the hash of the labels or values (in case of leaves) of its child nodes.
   Hash trees allow efficient and secure verification of the contents of large data structures
 
+- Anti-entropy ensures that live replicas periodically compare data:
+  - Full dataset hashes (Merkle trees), or
+  - Version metadata (vector clocks)
+- This comparison allows replicas to:
+  - Detect which updates are missing
+  - Identify divergent keys or ranges
+
 - Use of Merkle Tree:
   - Replica comparison:
     - If two replicas have same root hash, data is identical. 
