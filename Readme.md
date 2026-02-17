@@ -54,6 +54,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design a Chat Application](./design-problems/whatsapp-design/main.md)
 - [Design a Youtube-like Video Streaming Service](./design-problems/video-streaming-service/main.md)
 - [Design Google Drive](./design-problems/google-drive/main.md)
+- [Design a Payment System](./design-problems/payment-gateway/main.md)
 
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
@@ -64,6 +65,8 @@ A collection of materials referred to while learning:
 - System Design Course by Gaurav Sen
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
 - [System Design Interview - Alex Xu pdf (Part 1)](./resources/system-design-interview-an-insider-guide-by-Alex-Yu.pdf)
+- [Designing Data Intensive Applications](./resources/designing-data-intensive-applications.pdf)
+- [System Design - The Big Archive](./resources/system-design-the-big-archive.pdf)
 <!-- - [Grokking the System Design Interview](https://www.designgurus.io/course/system-design) -->
 
 ## Articles
