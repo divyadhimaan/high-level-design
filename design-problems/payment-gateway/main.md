@@ -39,3 +39,15 @@
 > Q: Is there anything else I should pay attention to?
 > 
 > A: We need to support reconciliations to fix any inconsistencies in communicating with internal and external systems.
+
+### Functional Requirements
+- Pay-in Flow: payment system receives money from customers on behalf of sellers
+- Pay-out flow: payment system sends money to sellers
+
+### Non-Functional Requirements
+- Reliability and Fault Tolerance
+- Reconciliation process between internal services and external services
+
+## Step 2: High Level Design
+
+- 
