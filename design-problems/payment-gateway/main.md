@@ -50,4 +50,6 @@
 
 ## Step 2: High Level Design
 
-- 
+The payment flow is broken down into two steps
+- Pay-in flow
+- Pay-out flow
