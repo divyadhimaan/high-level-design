@@ -53,3 +53,16 @@
 The payment flow is broken down into two steps
 - Pay-in flow
 - Pay-out flow
+
+> Example
+> - An e-commerce platform like Amazon is used to explain payment flow. 
+> - When a buyer places an order, the payment goes into Amazon’s bank account → called Pay-in flow. 
+> - Although the money is in Amazon’s account, Amazon does not own all of it. 
+> - Sellers own most of the money, while Amazon acts as a custodian/holder of funds. 
+> - Amazon temporarily holds the payment until order completion. 
+> - After the product is delivered and payment is released, Amazon deducts its fees/commission. 
+> - The remaining balance is transferred to the seller’s bank account → called Pay-out flow.
+
+
+### Pay-in Flow
+
