@@ -65,4 +65,24 @@ Two APIs are needed
 ## 1b. Check the inventory of found DCs
 
 - We can query by joining our item table and inventory table
-- Let's assume we have postgres DB, we get name, description and quantity of the items from the join
+- Let's assume we have postgres DB, we get name, description and quantity of the items from the join.
+
+> Note: 
+> - In real e-commerce systems, Catalog and Inventory are stored separately. Reason: different consumers + workloads
+> - In this design: keeping them in the same DB (simplification for requirements)
+> - Mention in interview:
+>   - Ideally separate Catalog & Inventory
+>   - Use search index (e.g., Elasticsearch) for catalog search
+
+![lookup-for-inventory](images/inventory-lookup.png)
+
+## Diagram
+
+1. user makes a request with (keyword, LAT, LONG)
+2. API gateway forwards the request to Availability Service.
+3. Availability Service calls nearby service with user's LAT and LONG
+4. Nearby service uses DC table to find the nearby DCs and returns a list.
+5. Availability Service calls inventory query on all the nearby DCs found.
+6. the Inventory query joins item and inventory table to find the available quantity of asked items (uses keyword if provided)
+
+![img_1.png](images/high-level-design.png)
