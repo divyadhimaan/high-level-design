@@ -23,3 +23,21 @@ To design a delivery service
 2. Ordering should be strongly consistent: two customers should not be able to purchase the same physical product.
 3. System should be able to support 10k DCs and 100k items in the catalog across DCs.
 4. Order volume will be O(10m orders/day)
+
+## Set-Up
+
+### Core Entities
+
+- Items: A type of item, e.g. Cheetos. These are what our customers will actually care about.
+- Inventory: A physical instance of an item, located at a DC. We'll sum up Inventory to determine the quantity available to a specific user for a specific Item.
+- Distributed Centers (DCs): A physical location where items are stored. We'll use these to determine which items are available to a user. Inventory are stored in DCs.
+- Order: A collection of Inventory which have been ordered by a user (and shipping/billing information).
+- Order Items
+
+### APIs
+
+Two APIs are needed
+- Fetch the items available to user in the given location using a keyword
+- Place a order
+
+![img.png](images/APIs.png)
