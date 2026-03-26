@@ -46,7 +46,7 @@ Two APIs are needed
 
 ## High Level Design
 
-### 1. Customers should be able to query availability of items
+### Feature 1. Customers should be able to query availability of items
 
 - We need 2 steps
   - Find DCs that are close enough to the user
@@ -54,7 +54,7 @@ Two APIs are needed
 > Note: Each step should be very fast, since we want the e2e latency to be ~100ms
 
 
-### 1a. Find the nearby DCs
+#### 1a. Find the nearby DCs
 
 - We can build an internal API to which takes longitude and latitude of user and returns a list of DCs within 1 hour.
 - Assuming we have a table of all DCs with their LAT and LONG.
@@ -62,7 +62,7 @@ Two APIs are needed
 
 ![finding-nearby-DCs](images/findDCs.png)
 
-## 1b. Check the inventory of found DCs
+#### 1b. Check the inventory of found DCs
 
 - We can query by joining our item table and inventory table
 - Let's assume we have postgres DB, we get name, description and quantity of the items from the join.
@@ -76,13 +76,32 @@ Two APIs are needed
 
 ![lookup-for-inventory](images/inventory-lookup.png)
 
-## Diagram
+#### Design Diagram using Feature 1
 
-1. user makes a request with (keyword, LAT, LONG)
+1. User makes a request with (keyword, LAT, LONG)
 2. API gateway forwards the request to Availability Service.
 3. Availability Service calls nearby service with user's LAT and LONG
 4. Nearby service uses DC table to find the nearby DCs and returns a list.
 5. Availability Service calls inventory query on all the nearby DCs found.
-6. the Inventory query joins item and inventory table to find the available quantity of asked items (uses keyword if provided)
+6. The Inventory query joins item and inventory table to find the available quantity of asked items (uses keyword if provided) and returns a list of all items and their available quantities (this returned list is a union of all nearby DCs).
 
-![img_1.png](images/high-level-design.png)
+![high-level-design-part1](images/high-level-design-part-1.png)
+
+### Feature 2: Customers should be able to order items.
+
+- This feature requires strong consistency (We don't want two users placing order for same item.)
+- Steps involved:
+  - Check Inventory
+  - Record order placed (hold items)
+  - Update Inventory
+> Note: We need to do these above 3 steps atomically
+
+#### How do we handle double booking?
+- Prevent double booking → common system design concern
+- Need locking mechanism on inventory
+- Flow:
+  - Lock inventory 
+  - Check availability 
+  - Create order 
+  - Release lock
+- Only one user holds lock at a time
