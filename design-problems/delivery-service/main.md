@@ -41,3 +41,28 @@ Two APIs are needed
 - Place a order
 
 ![img.png](images/APIs.png)
+
+---
+
+## High Level Design
+
+### 1. Customers should be able to query availability of items
+
+- We need 2 steps
+  - Find DCs that are close enough to the user
+  - Once we have the list of serviceable DCs, we can check the inventory and return a union to the user
+> Note: Each step should be very fast, since we want the e2e latency to be ~100ms
+
+
+### 1a. Find the nearby DCs
+
+- We can build an internal API to which takes longitude and latitude of user and returns a list of DCs within 1 hour.
+- Assuming we have a table of all DCs with their LAT and LONG.
+- We can add simple math (Euclidean or Haversine formula (advanced)) to find the distance
+
+![finding-nearby-DCs](images/findDCs.png)
+
+## 1b. Check the inventory of found DCs
+
+- We can query by joining our item table and inventory table
+- Let's assume we have postgres DB, we get name, description and quantity of the items from the join
