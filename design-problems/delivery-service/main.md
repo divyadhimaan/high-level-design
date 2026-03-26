@@ -99,9 +99,52 @@ Two APIs are needed
 #### How do we handle double booking?
 - Prevent double booking → common system design concern
 - Need locking mechanism on inventory
-- Flow:
-  - Lock inventory 
-  - Check availability 
-  - Create order 
-  - Release lock
-- Only one user holds lock at a time
+
+##### Approach 1: Two different data-stores with distributes locks
+| Aspect           | Description                                      | Impact / Risk                  | Mitigation / Notes                       |
+|------------------|--------------------------------------------------|--------------------------------|------------------------------------------|
+| **Architecture** | Separate DBs for Orders & Inventory              | Flexibility, optimized storage | Use best DB per use case                 |
+| **Orders DB**    | Relational database                              | Strong consistency for orders  | Suitable for transactional data          |
+| **Inventory DB** | Key-value store                                  | Fast reads/writes              | Optimized for high-throughput updates    |
+| **Failure Case** | Order created but inventory not decremented      | Overselling, inconsistency     | Background reconciliation / sweeper jobs |
+| **Deadlock**     | User1 locks A, needs B<br>User2 locks B, needs A | System stuck / no progress     | Lock ordering, timeouts, retries         |
+| **Overall Risk** | Distributed system complexity                    | Harder to maintain consistency | Requires careful failure handling        |
+
+
+##### Approach 2: Singular Postgres Transaction
+
+
+| Aspect               | Description                                 | Impact / Benefit           | Tradeoff / Risk                         |
+|----------------------|---------------------------------------------|----------------------------|-----------------------------------------|
+| **Architecture**     | Single DB (Postgres) for Orders + Inventory | Simpler design             | Tight coupling of services              |
+| **ACID Properties**  | Leverages ACID guarantees                   | Strong consistency         | Reduced flexibility                     |
+| **Isolation Level**  | Uses SERIALIZABLE isolation                 | Prevents race conditions   | Lower throughput under high concurrency |
+| **Transaction Flow** | Single transaction for order + inventory    | Atomicity + consistency    | Longer transaction duration             |
+| **Concurrency**      | One of concurrent orders fails to commit    | No double booking          | Retry handling required                 |
+| **Scaling**          | Orders & Inventory scale together           | Easier to manage initially | Hard to scale independently             |
+| **Flexibility**      | Cannot use specialized DBs per use case     | Simpler stack              | Suboptimal performance at scale         |
+| **Overall Tradeoff** | Strong consistency + simplicity             | Reliable system            | Scalability limitations                 |
+
+> Note: When atomicity is required, utilize the ACID properties of the DB.
+
+- By choosing the Approach 2 and leaning in to our existing Postgres database we can keep our system simple and still meet our requirements. 
+
+#### Flow for Feature 2
+
+- For an order, the process looks like this:
+  - The user makes a request to the Orders Service to place an order for items A, B, and C.
+  - The Orders Service creates a singular transaction which we submit to our Postgres leader. This transaction: 
+    - Checks the inventory for items A, B, and C > 0. 
+    - If any of the items are out of stock, the transaction fails. 
+    - If all items are in stock, the transaction records the order and updates the status for inventory items A, B, and C to "ordered". 
+    - A new row is created in the Orders table (and OrderItems table) recording the order for A, B, and C.
+    - The transaction is committed.
+  - If the transaction succeeds, we return the order to the user.
+
+### High Level Design
+
+- Both our `Availability` and `Orders` service use the `Nearby` service to look up DCs that are close enough to the user.
+- We have a singular Postgres database for inventory and orders, partitioned by region
+- Our Availability service reads via read replicas, our Orders service writes to the leader using atomic transactions to avoid double writes.
+
+![high-level-design](images/high-level-design.png)
