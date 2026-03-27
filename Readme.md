@@ -68,6 +68,7 @@ A collection of materials referred to while learning:
 - [System Design Interview - Alex Xu pdf (Part 1)](./resources/system-design-interview-an-insider-guide-by-Alex-Yu.pdf)
 - [Designing Data Intensive Applications](./resources/designing-data-intensive-applications.pdf)
 - [System Design - The Big Archive](./resources/system-design-the-big-archive.pdf)
+- [Hello Interview](https://www.hellointerview.com)
 <!-- - [Grokking the System Design Interview](https://www.designgurus.io/course/system-design) -->
 
 ## Articles
