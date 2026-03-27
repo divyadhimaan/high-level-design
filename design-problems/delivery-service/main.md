@@ -166,10 +166,36 @@ Two APIs are needed
 
 #### Approaches
 
-| Approach                                      | Description                                                                                 | Benefit                                    | Challenges / Risks                                                                                             | Optimization / Notes                                              | Diagram                                  |
-|-----------------------------------------------|---------------------------------------------------------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|------------------------------------------| 
-| **Approach 1: SQL Distance**                  | Store DC lat/long in DB → compute distance (Euclidean / Haversine) → filter within X radius | Simple, fast, no external dependency       | Ignores traffic, roads, real travel time<br>Inaccurate proximity<br>Multiple DCs in same city not handled well | Good as **initial pre-filter**                                    | ![img.png](images/approach1-diagram.png) |
-| **Approach 2: Travel Time (All DCs)**         | Sync DCs to memory → call travel-time API for **every DC**                                  | Accurate (real travel time, traffic-aware) | Too many API calls<br>High cost + latency<br>Most DCs irrelevant                                               | Not scalable directly                                             | ![img.png](images/approach2-diagram.png) |
-| **Approach 3: Hybrid (Nearby + Travel Time)** | Sync DCs → filter by radius (e.g., 60 miles) → call travel-time API only for candidates     | Balanced: accuracy + efficiency            | Still some API overhead<br>Radius tuning needed                                                                | **Best approach (industry standard)**<br>Combines speed + realism | ![img.png](images/approach3-diagram.png) |
+| Approach                                      | Description                                                                                      | Benefit                                    | Challenges / Risks                                                                                             | Optimization / Notes                                              | Diagram                                  |
+|-----------------------------------------------|--------------------------------------------------------------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|------------------------------------------| 
+| **Approach 1: SQL Distance**                  | Store DC lat/long in DB → compute distance (Euclidean / Haversine) → filter within X radius      | Simple, fast, no external dependency       | Ignores traffic, roads, real travel time<br>Inaccurate proximity<br>Multiple DCs in same city not handled well | Good as **initial pre-filter**                                    | ![img.png](images/approach1-diagram.png) |
+| **Approach 2: Travel Time (All DCs)**         | Sync DCs to memory → call travel-time API for **every DC**                                       | Accurate (real travel time, traffic-aware) | Too many API calls<br>High cost + latency<br>Most DCs irrelevant                                               | Not scalable directly                                             | ![img.png](images/approach2-diagram.png) |
+| **Approach 3: Hybrid (Nearby + Travel Time)** | Sync DCs → filter by radius (e.g., 60 miles) → call travel-time API only for filtered candidates | Balanced: accuracy + efficiency            | Still some API overhead<br>Radius tuning needed                                                                | **Best approach (industry standard)**<br>Combines speed + realism | ![img.png](images/approach3-diagram.png) |
 
+> We pick approach 3
+
+### 3. Availability lookups to be fast and scalable
+
+- Current: Availability fetched directly from DB → high load
+- Problem: 
+  - Does not scale
+  - DB becomes read bottleneck
+  - High latency + potential throttling
+
+
+- Estimation:
+  - Orders/day = 10M
+  - Users browse ~10 pages/order
+  - Conversion rate = 5%
+  - QPS: `10M / 100k sec * 10 / 0.05 = 20k QPS`
+  - → Very high read load
+
+#### Approaches
+
+| Approach                                     | Description                                                                                                 | Benefit                                                           | Challenges / Risks                                   | Optimization / Notes                                                                                     | Diagram                                  |
+|----------------------------------------------|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|------------------------------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------------------|
+| **Approach 1: Cache (Redis)**                | Query availability via cache → on miss fetch from DB → populate cache (TTL ~1 min)                          | Very low latency<br>Handles high QPS (20k+)                       | Cache consistency issues<br>Stale data risk          | Use **cache invalidation** on inventory updates<br>Read-through / write-through patterns                 | ![img_1.png](images/part2-approach1.png) |
+| **Approach 2: Read Replicas + Partitioning** | Partition inventory by region (e.g., zipcode prefix)<br>Use Postgres read replicas for availability queries | Scales reads horizontally<br>Reduces query scope (1–2 partitions) | Replica sizing complexity<br>Hot partitions possible | Route reads to replicas<br>Writes go to leader (strong consistency)<br>Rebalance partitions periodically | ![img.png](images/part2-approach2.png)   |
+
+> We pick approach 2
 
