@@ -153,3 +153,23 @@ Two APIs are needed
 
 ## Deep Dive
 
+### 1. Availability lookups to incorporate traffic and drive time.
+
+- Current approach: **distance-based DC selection**
+- Problem:
+  - Ignores real-world constraints:
+  - Rivers / borders
+  - Road network
+  - Traffic conditions
+- Result: inaccurate "nearest" DC
+
+
+#### Approaches
+
+| Approach                                      | Description                                                                                 | Benefit                                    | Challenges / Risks                                                                                             | Optimization / Notes                                              | Diagram                                  |
+|-----------------------------------------------|---------------------------------------------------------------------------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|------------------------------------------| 
+| **Approach 1: SQL Distance**                  | Store DC lat/long in DB → compute distance (Euclidean / Haversine) → filter within X radius | Simple, fast, no external dependency       | Ignores traffic, roads, real travel time<br>Inaccurate proximity<br>Multiple DCs in same city not handled well | Good as **initial pre-filter**                                    | ![img.png](images/approach1-diagram.png) |
+| **Approach 2: Travel Time (All DCs)**         | Sync DCs to memory → call travel-time API for **every DC**                                  | Accurate (real travel time, traffic-aware) | Too many API calls<br>High cost + latency<br>Most DCs irrelevant                                               | Not scalable directly                                             | ![img.png](images/approach2-diagram.png) |
+| **Approach 3: Hybrid (Nearby + Travel Time)** | Sync DCs → filter by radius (e.g., 60 miles) → call travel-time API only for candidates     | Balanced: accuracy + efficiency            | Still some API overhead<br>Radius tuning needed                                                                | **Best approach (industry standard)**<br>Combines speed + realism | ![img.png](images/approach3-diagram.png) |
+
+
