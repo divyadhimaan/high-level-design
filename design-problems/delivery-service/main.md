@@ -148,3 +148,8 @@ Two APIs are needed
 - Our Availability service reads via read replicas, our Orders service writes to the leader using atomic transactions to avoid double writes.
 
 ![high-level-design](images/high-level-design.png)
+
+---
+
+## Deep Dive
+
