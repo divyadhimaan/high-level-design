@@ -55,7 +55,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design a Youtube-like Video Streaming Service](./design-problems/video-streaming-service/main.md)
 - [Design Google Drive](./design-problems/google-drive/main.md)
 - [Design a Payment System](./design-problems/payment-gateway/main.md)
-- [Design a local Delivery Service](./design-problems/delivery-service/main.md)
+- [Design a Local Delivery Service](./design-problems/delivery-service/main.md)
 
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
