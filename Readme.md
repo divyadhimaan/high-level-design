@@ -39,6 +39,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)
 - [Tinder Design - Recommendation](./design-problems/tinder/main.md)
+- [Design a Load Balancer](./design-problems/load-balancer/main.md)
 - [Google Docs - Collaborative Editor Design](./design-problems/google-docs/main.md)
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 - [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
