@@ -44,3 +44,8 @@ A Load Balancer is a critical infrastructure component that distributes incoming
 - **Layer 4 and Layer 7 Support**: Support both transport-level (TCP/UDP) and application-level (HTTP/HTTPS) load balancing.
 
 ### Non Functional Requirements
+- **High Availability**: The load balancer must be highly available (99.99% uptime) with no single point of failure.
+- **Low Latency**: Should add minimal latency to requests (< 1ms overhead).
+- **High Throughput**: Handle up to 1 million requests per second at peak.
+- **Scalability**: Should scale horizontally to handle increasing traffic.
+- **Fault Tolerance**: Continue operating even when individual components fail.
