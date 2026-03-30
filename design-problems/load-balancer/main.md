@@ -49,3 +49,71 @@ A Load Balancer is a critical infrastructure component that distributes incoming
 - **High Throughput**: Handle up to 1 million requests per second at peak.
 - **Scalability**: Should scale horizontally to handle increasing traffic.
 - **Fault Tolerance**: Continue operating even when individual components fail.
+
+---
+
+## Estimations
+
+### 1. Traffic 
+| Category | Metric                 | Value     | Notes                  |
+|----------|------------------------|-----------|------------------------|
+| Traffic  | Peak RPS               | 1,000,000 | Maximum load           |
+| Traffic  | Average RPS            | ~300,000  | ~1/3 of peak           |
+| Traffic  | Concurrent Connections | ~500,000  | Derived using duration |
+
+
+### 2. Concurrent Connections Calculation
+
+| Parameter            | Value                                   |
+|----------------------|-----------------------------------------|
+| Avg Request Duration | 0.5 sec (500 ms)                        |
+| Formula              | Concurrent Connections = RPS × Duration |
+| Calculation          | 1,000,000 × 0.5                         |
+| Result               | 500,000 connections                     |
+
+### 3. Bandwidth Estimates
+
+| Type              | Formula     | Value              |
+|-------------------|-------------|--------------------|
+| Request Size      | —           | 2 KB               |
+| Response Size     | —           | 10 KB              |
+| Ingress Bandwidth | 1M × 2 KB   | 2 GB/s             |
+| Egress Bandwidth  | 1M × 10 KB  | 10 GB/s            |
+| Total Bandwidth   | 2 + 10 GB/s | 12 GB/s (~96 Gbps) |
+
+
+### 4. Health Check Overhead
+
+| Parameter       | Value              |
+|-----------------|--------------------|
+| Backend Servers | 1000               |
+| Check Interval  | 5 sec              |
+| Formula         | Servers / Interval |
+| Result          | 200 checks/sec     |
+| Impact          | Negligible         |
+
+### 5. Memory Requirements (Per Connection)
+
+| Component                | Size           |
+|--------------------------|----------------|
+| Source IP + Port         | 6 bytes        |
+| Destination IP + Port    | 6 bytes        |
+| Connection State         | 4 bytes        |
+| Timestamps               | 16 bytes       |
+| Protocol Data            | ~200 bytes     |
+| Buffer Space             | ~250 bytes     |
+| **Total per Connection** | **~500 bytes** |
+
+
+### Summary
+
+| Area          | Observation                 | Impact                         |
+|---------------|-----------------------------|--------------------------------|
+| Network       | ~12 GB/s (~96 Gbps)         | 🚨 Primary bottleneck          |
+| Memory        | ~250 MB                     | ✅ Not a concern                |
+| Health Checks | 200 RPS                     | ✅ Negligible                   |
+| Scalability   | Single machine insufficient | 🚀 Requires horizontal scaling |
+
+---
+
+## Core APIs
