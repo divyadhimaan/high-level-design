@@ -117,3 +117,56 @@ A Load Balancer is a critical infrastructure component that distributes incoming
 ---
 
 ## Core APIs
+
+| Plane             | Purpose                            | Characteristics              | API requirement        |
+|-------------------|------------------------------------|------------------------------|------------------------|
+| **Data Plane**    | Handles actual request traffic     | High throughput, low latency | No                     |
+| **Control Plane** | Handles configuration & management | Low traffic, high importance | Explicit APIs required |
+
+![img.png](images/plane-architecture.png)
+
+## APIs for Control Plane
+
+### 1. Register Backend Server
+
+Endpoint: `POST /backends`
+
+- When you spin up a new application server, you need to tell the load balancer about it. 
+- This endpoint adds a backend to the pool and starts health checking it.
+
+![img.png](images/backend-server-register-api.png)
+
+> The initial status is "unknown" because we have not run a health check yet. Within a few seconds, it will transition to "healthy" or "unhealthy."
+
+
+### 2. Remove Backend Server
+
+Endpoint: `DELETE /backends/{backend_id}`
+
+- When you want to decommission a server (for maintenance, scaling down, or replacement), this endpoint removes it from the pool. 
+- The load balancer will stop sending new traffic immediately, but existing connections are allowed to complete gracefully.
+- path params: `backend_id` - the ID returned when the backend was registered
+
+![img.png](images/backend-server-remove-api.png)
+
+> The `drained_connections` field tells you how many connections were in progress when the backend was removed.
+
+### 3. Get Backend Health Status
+
+Endpoint: `GET /backends/{backend_id}/health`
+
+- Returns detailed health information about a specific backend, useful for debugging and monitoring dashboards.
+
+![img.png](images/health-check-api.png)
+
+> The response includes both current state (status, active connections) and historical metrics (total requests, failures) to help operators understand backend performance over time.
+
+
+### 4. Configure Load Balancing Algorithm
+
+Endpoint: `PUT /config/algorithm`
+
+- Changes how traffic is distributed across backends. 
+- This takes effect immediately for new connections (existing connections are not affected).
+
+![img.png](images/load-balancing-configure-algo-api.png)
