@@ -180,3 +180,8 @@ Endpoint: `PUT /config/algorithm`
   - **Distribute Traffic**: Accept incoming requests and forward them to healthy backend servers.
   - **Monitor Health**: Continuously check backends and route around failures.
   - **Stay Available**: The load balancer itself cannot be a single point of failure.
+
+- The architecture will split into two parts
+  - Data plane - handles actual traffic at high speed
+  - Control plane - manages configuration and health checking at a slower pace.
+- 
