@@ -170,3 +170,8 @@ Endpoint: `PUT /config/algorithm`
 - This takes effect immediately for new connections (existing connections are not affected).
 
 ![img.png](images/load-balancing-configure-algo-api.png)
+
+
+---
+
+## High Level Design
