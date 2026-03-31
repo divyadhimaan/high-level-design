@@ -175,3 +175,8 @@ Endpoint: `PUT /config/algorithm`
 ---
 
 ## High Level Design
+
+- Fundamental operations
+  - **Distribute Traffic**: Accept incoming requests and forward them to healthy backend servers.
+  - **Monitor Health**: Continuously check backends and route around failures.
+  - **Stay Available**: The load balancer itself cannot be a single point of failure.
