@@ -184,4 +184,4 @@ Endpoint: `PUT /config/algorithm`
 - The architecture will split into two parts
   - Data plane - handles actual traffic at high speed
   - Control plane - manages configuration and health checking at a slower pace.
-- 
+
