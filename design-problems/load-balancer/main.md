@@ -182,6 +182,10 @@ Endpoint: `PUT /config/algorithm`
   - **Stay Available**: The load balancer itself cannot be a single point of failure.
 
 - The architecture will split into two parts
-  - Data plane - handles actual traffic at high speed
-  - Control plane - manages configuration and health checking at a slower pace.
+  - Data plane 
+    - handles actual traffic at high speed
+    - must be fast since every request flows through it
+  - Control plane 
+    - manages configuration and health checking at a slower pace.
+    - can be slower since configuration changes and health checks happen infrequently compared to request traffic
 
