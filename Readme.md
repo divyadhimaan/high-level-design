@@ -37,30 +37,45 @@ This repository contains notes, diagrams, and code snippets created while learni
 
 
 ## System Design Problems
-- [Email Service](./design-problems/emailing-service/main.md)
-- [Tinder Design - Recommendation](./design-problems/tinder/main.md)
-- [Design a Load Balancer](./design-problems/load-balancer/main.md)
-- [Google Docs - Collaborative Editor Design](./design-problems/google-docs/main.md)
-- [Uber - Cab Aggregator App](./design-problems/uber/main.md)
-- [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
-- [Whatsapp Calling](./design-problems/whatsapp-calling-app/main.md)
-- [Design a Consistent Hashing](./design-problems/consistent-hashing/main.md)
+
+### Basic
 - [Design a URL shortener](./design-problems/url-shortener/main.md)
-- [Design an Unique ID generator](./design-problems/unique-id-generator/main.md)
-- [Design a Web Crawler](./design-problems/web-crawler/main.md)
-- [Design a Notification System](./design-problems/notification-system/main.md)
-- [Design a News Feed System](./design-problems/news-feed-system/main.md)
+
+### Real Time Communication
 - [Design a Chat Application](./design-problems/whatsapp-design/main.md)
+- [Whatsapp Calling](./design-problems/whatsapp-calling-app/main.md)
+- [Google Docs - Collaborative Editor Design](./design-problems/google-docs/main.md)
+- [Design a Notification System](./design-problems/notification-system/main.md)
+
+
+### Social Media
+- [Tinder Design - Recommendation](./design-problems/tinder/main.md)
+- [Design a News Feed System](./design-problems/news-feed-system/main.md)
+
+### Media Streaming & Delivery
+- [Email Service](./design-problems/emailing-service/main.md)
 - [Design a Youtube-like Video Streaming Service](./design-problems/video-streaming-service/main.md)
 - [Design Google Drive](./design-problems/google-drive/main.md)
-- [Design a Payment System](./design-problems/payment-gateway/main.md)
-- [Design a Local Delivery Service](./design-problems/delivery-service/main.md)
 
+### Location Based
+
+- [Design a Local Delivery Service](./design-problems/delivery-service/main.md)
+- [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 
 ### Distributed systems
 - [Design Load Balancer](./design-problems/load-balancer)
 - [Design a Rate Limiter](./design-problems/rate-limiter/main.md)
 - [Design a Key Value Store](./design-problems/key-value-store/main.md)
+- [Design a Consistent Hashing](./design-problems/consistent-hashing/main.md)
+- [Design an Unique ID generator](./design-problems/unique-id-generator/main.md)
+
+## Misc
+- [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
+- [Design a Web Crawler](./design-problems/web-crawler/main.md)
+- [Design a Payment System](./design-problems/payment-gateway/main.md)
+
+---
+
 
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
