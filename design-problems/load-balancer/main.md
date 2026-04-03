@@ -255,7 +255,70 @@ Endpoint: `PUT /config/algorithm`
 ### 2. Health Monitoring
 
 - Without health checking, the load balancer would blindly keep sending traffic to dead servers, and users would see errors.
-- 
+- Health monitoring solves this by continuously checking each backend and automatically routing around failures.
+
+- New Component: Health Checker
+  - a background process that periodically probes each backend server to verify it is working correctly.
+  - Sends periodic probes to each backend (typically every 5-10 seconds)
+  - Tracks the history of successes and failures
+  - Decides when a backend should be marked unhealthy (usually after 2-3 consecutive failures)
+  - Decides when an unhealthy backend can be marked healthy again (after 2-3 consecutive successes)
+  - Notifies the routing engine whenever a backend's status changes
+- This entire process happens automatically. No human intervention is required to handle a failed server.
+
+
+#### Types of Health Checks
+| Type              | How It Works                                                      | When to Use                                    |
+|-------------------|-------------------------------------------------------------------|------------------------------------------------|
+| **TCP Check**     | Opens a TCP connection and closes it                              | Basic connectivity check                       |
+| **HTTP Check**    | Sends HTTP request (e.g., `GET /health`) and expects 2xx response | Web apps / APIs                                |
+| **Custom Script** | Executes user-defined script/command                              | Advanced validation (DB, queues, dependencies) |
+
+> Note: Most production deployments use HTTP health checks. The application exposes a /health or /healthz endpoint that returns 200 OK when everything is working, and returns an error (or times out) when something is wrong.
+
+---
+
+### 3. High Availability
+
+- Problem?
+  - We built a load balancer to eliminate single points of failure in our backend, but the load balancer itself is now a single point of failure.
+  -  If it crashes, all traffic stops.
+- Solution: Run multiple load balancer instances.
+- But we have to handle questions like - 
+  - How do clients know which instance to connect to?
+  - What happens when one instance fails?
+  - How do we handle state (like sticky sessions) across multiple instances?
+
+> There are two patterns to solve above problem
+
+#### Patterns to solve above Problem
+
+| Aspect                   | Active-Passive                      | Active-Active                        |
+|--------------------------|-------------------------------------|--------------------------------------|
+| **Basic Idea**           | One node active, one standby        | Multiple nodes active simultaneously |
+| **Traffic Handling**     | Only active node serves traffic     | Traffic distributed across all nodes |
+| **Client Connection**    | Via **VIP (Virtual IP)**            | Multiple IPs / shared IP             |
+| **Failover Mechanism**   | Standby takes over VIP using ARP    | Other nodes continue serving traffic |
+| **Failure Impact**       | Short disruption (1–3 sec failover) | Reduced capacity, no downtime        |
+| **Resource Utilization** | ❌ 50% wasted (idle standby)         | ✅ Fully utilized                     |
+| **Complexity**           | Simple                              | Complex                              |
+| **State Management**     | No sync needed                      | Requires state sync (e.g., sessions) |
+| **Sticky Sessions**      | Easy (all state on one node)        | Requires shared state store          |
+| **Scalability**          | Limited                             | Highly scalable                      |
+| **Setup Difficulty**     | Easy                                | Moderate–Hard                        |
+
+
+> For most production systems handling significant traffic, active-active is the better choice despite its complexity. The benefits of full resource utilization and instant failover outweigh the added complexity of state synchronization.
+
+### High level design - Diagram
+
+![high-level-design](images/high-level-design.png)
+1. **Clients connect to the VIP**. They do not know (or care) about the individual load balancer nodes. The VIP is a stable entry point that abstracts away the LB cluster.
+2. **Traffic is distributed across LB nodes**. In active-active mode, both LB Node 1 and LB Node 2 handle traffic simultaneously.
+3. **Each LB node routes to healthy backends**. Backend 3 failed health checks and is marked unhealthy (red), so no traffic goes to it. LB nodes only send traffic to Backends 1 and 2.
+4. **Session state is shared**. If a user's first request hits LB Node 1 and sticky sessions are enabled, their session mapping is stored in Redis. If their next request happens to hit LB Node 2, it can still route them to the correct backend by looking up their session in Redis.
+5. **Health checking runs continuously**. The Health Checker monitors all backends and both LB nodes. When it detects Backend 3 is unhealthy, it notifies both LB nodes to stop routing traffic there.
+6. **Configuration is managed centrally**. The Config Manager stores configuration (backend lists, algorithms, health check settings) in the Config Store and pushes updates to all LB nodes.
 
 ## Glossary
 
