@@ -189,3 +189,4 @@ Endpoint: `PUT /config/algorithm`
     - manages configuration and health checking at a slower pace.
     - can be slower since configuration changes and health checks happen infrequently compared to request traffic
 
+![architecture](images/architecture.png)
