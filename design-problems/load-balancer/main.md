@@ -198,7 +198,8 @@ Endpoint: `PUT /config/algorithm`
   - Frontend Listeners
   - Routing Engine
   - Backend Pool
-![img.png](img.png)
+
+![img.png](data-plane/img.png)
 
 #### Frontend Listeners
 
@@ -211,6 +212,49 @@ Endpoint: `PUT /config/algorithm`
 
 
 #### Routing Engine
+- This is the brain of the load balancer. 
+- Given a connection, the routing engine decides which backend server should handle it.
+- The routing engine maintains:
+  - A list of available backend servers and their metadata (address, port, weight)
+  - The current state of each backend (healthy, unhealthy, draining)
+  - Counters for connection tracking (needed for least-connections algorithm)
+  - The configured load balancing algorithm
+- When the frontend listener hands off a connection, the routing engine applies the configured algorithm (round robin, least connections, etc.) and returns the selected backend.
+
+#### Backend Pool
+
+- A backend pool is a logical group of servers that can handle the same type of traffic.
+- Key Idea: `Pool = set of interchangeable backend servers`
+- Simple Setup
+  - Single backend pool
+  - All requests routed to same group of servers
+- Complex Setup (Real Systems)
+  - Multiple Pools based on service type:
+  - API Pool → handles /api requests
+  - Static Content Pool → serves images, CSS, JS
+  - Auth Pool → handles login/authentication
+
+- Each pool contains:
+  - A list of backend servers with their addresses and ports
+  - Pool-specific configuration (algorithm, health check settings)
+  - Health status for each backend in the pool
+
+#### Request Flow through system
+
+![img_2.png](images/request-flow.png)
+
+1. **Connection arrives**: A client sends an HTTP request to the load balancer's public IP address (e.g., https://api.example.com).
+2. **Frontend listener accepts**: The listener accepts the TCP connection and, for HTTP traffic, reads enough of the request to understand what is being asked (the URL, headers, etc.).
+3. **Routing decision**: The listener asks the routing engine to select a backend. The engine checks the backend pool, filters out unhealthy servers, and applies the configured algorithm.
+4. **Forward to backend**: The request is forwarded to the selected backend server. This might be a simple proxy (read request, forward, read response) or a more sophisticated connection multiplexing setup.
+5. **Return response**: The backend processes the request and sends a response. The load balancer forwards this back to the client.
+6. **Connection handling**: Depending on configuration, the client connection might be kept alive for additional requests (HTTP keep-alive) or closed
+
+---
+
+### 2. Health Monitoring
+
+- Without health checking, the load balancer would blindly keep sending traffic to dead servers, and users would see errors.
 - 
 
 ## Glossary
