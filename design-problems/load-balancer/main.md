@@ -352,6 +352,118 @@ Different type of databases have different requirements for speed, persistence a
 - Hot path (handling requests) should never touch disk or cross a network boundary for core routing decisions. 
 - Configuration is loaded into memory at startup and updated via push notifications when it changes.
 
+---
+
+## Deep Dive Design
+
+### Load Balancing Algorithms
+
+- These algorithms determine how traffic gets distributed across backends. 
+- Most important decisions: directly affects how evenly load is spread, how well the system handles failures, and how it behaves under various traffic patterns.
+- A good algorithm:
+  - Distributes load evenly across healthy backends
+  - Avoid overloading any single server
+  - Work well with your specific traffic patterns (stateless vs stateful, uniform vs variable request costs)
+  - Be simple enough to execute quickly (remember, this runs on every request)
+
+
+####  1. Round Robin
+- **Idea:** Sequential distribution of requests
+- **How:** `counter % n`
+- **Pros:** Simple, stateless, zero overhead
+- **Cons:** Ignores capacity, request cost, runtime load
+- **Best For:** Homogeneous servers, uniform workloads
+
+---
+
+#### 2. Weighted Round Robin
+- **Idea:** Traffic proportional to backend capacity
+- **How:** Assign weights → higher weight = more traffic
+- **Pros:** Utilizes heterogeneous servers efficiently
+- **Cons:** Static (no runtime adaptation), burst issues
+- **Best For:** Known capacity differences, gradual rollouts
+
+---
+
+#### 3. Least Connections
+- **Idea:** Route to backend with **fewest active connections**
+- **Pros:** Adapts to:
+    - Slow backends
+    - Expensive requests
+    - Runtime variations
+- **Cons:** Requires state tracking across LB nodes
+- **Best For:** Variable workloads (API + DB + file ops)
+
+---
+
+#### 4. Weighted Least Connections
+- **Idea:** Combines **capacity (weights) + real-time load**
+- **How:** Choose backend with lowest `connections / weight`
+- **Pros:**
+    - Capacity-aware
+    - Adaptive
+    - Balanced utilization
+- **Cons:** Slightly more complex
+- **Best For:** Production systems (default choice in many LBs)
+
+---
+
+#### 5. IP Hash (Source Hashing)
+- **Idea:** Same client → same backend (stickiness)
+- **How:** `hash(client_ip) % n`
+- **Pros:**
+    - No state needed
+    - Simple session persistence
+- **Cons:**
+    - NAT causes hotspots
+    - Uneven distribution
+    - Adding/removing nodes breaks mapping
+- **Best For:** Simple stickiness, non-HTTP protocols
+
+---
+
+#### 6. Consistent Hashing
+- **Idea:** Minimize remapping when backends change
+- **How:** Hash requests + servers on a ring
+- **Pros:**
+    - Minimal disruption on scaling
+    - Stable mapping
+- **Cons:**
+    - More complex
+    - Needs virtual nodes for balance
+- **Best For:**
+    - Auto-scaling systems
+    - Distributed caches
+    - Databases
+
+---
+
+#### Comparison Table
+
+| Algorithm                      | Complexity  | Statefulness   | Adaptiveness | Best For                               |
+|--------------------------------|-------------|----------------|--------------|----------------------------------------|
+| **Round Robin**                | Very simple | Stateless      | None         | Homogeneous backends, uniform requests |
+| **Weighted Round Robin**       | Simple      | Stateless      | None         | Known capacity differences             |
+| **Least Connections**          | Moderate    | Per-node state | High         | Variable request processing times      |
+| **Weighted Least Connections** | Moderate    | Per-node state | High         | Production systems with mixed servers  |
+| **IP Hash**                    | Simple      | Stateless      | None         | Basic session persistence              |
+| **Consistent Hashing**         | Complex     | Stateless      | None         | Dynamic scaling, caching systems       |
+
+---
+
+#### Recommendations
+
+- For most HTTP applications, start with Weighted Least Connections. It handles heterogeneous backends and variable request costs gracefully, adapting to runtime conditions automatically.
+
+- If your backends are identical and your requests are uniform (a rare but possible scenario), Round Robin is fine and slightly faster.
+
+- For session persistence, prefer cookie-based stickiness over IP hash when possible. IP hash is fragile due to NAT and uneven distribution.
+
+- Use Consistent Hashing when backends frequently scale up/down, or when you are load balancing cache servers where cache locality matters.
+
+---
+
+### Health Checking Strategies
 
 ## Glossary
 

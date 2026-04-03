@@ -44,10 +44,8 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 - [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
 - [Whatsapp Calling](./design-problems/whatsapp-calling-app/main.md)
-- [Design a Rate Limiter](./design-problems/rate-limiter/main.md)
 - [Design a Consistent Hashing](./design-problems/consistent-hashing/main.md)
 - [Design a URL shortener](./design-problems/url-shortener/main.md)
-- [Design a Key Value Store](./design-problems/key-value-store/main.md)
 - [Design an Unique ID generator](./design-problems/unique-id-generator/main.md)
 - [Design a Web Crawler](./design-problems/web-crawler/main.md)
 - [Design a Notification System](./design-problems/notification-system/main.md)
@@ -57,6 +55,12 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design Google Drive](./design-problems/google-drive/main.md)
 - [Design a Payment System](./design-problems/payment-gateway/main.md)
 - [Design a Local Delivery Service](./design-problems/delivery-service/main.md)
+
+
+### Distributed systems
+- [Design Load Balancer](./design-problems/load-balancer)
+- [Design a Rate Limiter](./design-problems/rate-limiter/main.md)
+- [Design a Key Value Store](./design-problems/key-value-store/main.md)
 
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
