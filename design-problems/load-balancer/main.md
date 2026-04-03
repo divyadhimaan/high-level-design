@@ -336,6 +336,22 @@ Endpoint: `PUT /config/algorithm`
 
 ## Database Design
 
+Different type of databases have different requirements for speed, persistence and sharing: 
+
+| Data Type                 | Storage Location           | Why?                                                                      |
+|---------------------------|----------------------------|---------------------------------------------------------------------------|
+| **Active Connections**    | In-memory (per LB node)    | Ultra-low latency required (microseconds); local ownership of connections |
+| **Backend Health Status** | In-memory (per LB node)    | Frequently updated via health checks; fast access for routing decisions   |
+| **Connection Counters**   | In-memory (per LB node)    | Updated on every request; needed for algorithms like least-connections    |
+| **Session Mappings**      | Redis cluster              | Shared across LB nodes; enables sticky sessions in active-active setup    |
+| **Backend Configuration** | etcd / Consul / PostgreSQL | Persistent, versioned, survives restarts and deployments                  |
+| **Metrics & Logs**        | Prometheus / InfluxDB      | Historical analysis, dashboards, alerting                                 |
+
+### Important Details
+
+- Hot path (handling requests) should never touch disk or cross a network boundary for core routing decisions. 
+- Configuration is loaded into memory at startup and updated via push notifications when it changes.
+
 
 ## Glossary
 
