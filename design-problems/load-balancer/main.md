@@ -190,3 +190,44 @@ Endpoint: `PUT /config/algorithm`
     - can be slower since configuration changes and health checks happen infrequently compared to request traffic
 
 ![architecture](images/architecture.png)
+
+### 1. Traffic Distribution
+
+- The most basic job of a load balancer is accepting connections from clients and forwarding them to backend servers. 
+- Components Involved:
+  - Frontend Listeners
+  - Routing Engine
+  - Backend Pool
+![img.png](img.png)
+
+#### Frontend Listeners
+
+- This is the entry point for all client traffic. 
+- The frontend listener binds to one or more ports (typically 80 for HTTP, 443 for HTTPS) and accepts incoming TCP connections.
+- When a connection arrives, the listener needs to:
+  - Accept the TCP connection from the client
+  - For Layer 7 load balancing, parse enough of the request to make routing decisions (HTTP headers, URL path, etc.)
+  - Hand off the connection to the routing engine for backend selection
+
+
+#### Routing Engine
+- 
+
+## Glossary
+
+### Layer 4 vs Layer 7 Load Balancer
+| Aspect                         | Layer 4 Load Balancing                  | Layer 7 Load Balancing                    |
+|--------------------------------|-----------------------------------------|-------------------------------------------|
+| OSI Layer                      | Transport Layer (L4)                    | Application Layer (L7)                    |
+| Protocols                      | TCP, UDP                                | HTTP, HTTPS, gRPC                         |
+| Routing Basis                  | IP address, Port                        | URL, Headers, Cookies, Body               |
+| Content Awareness              | ❌ Not aware                             | ✅ Content-aware                           |
+| Processing                     | Packet-level forwarding                 | Request-level inspection                  |
+| Performance                    | ⚡ Very high (low latency)               | Moderate (higher latency)                 |
+| Flexibility                    | Limited                                 | Highly flexible                           |
+| Algorithms                     | Round Robin, Least Connections, IP Hash | Advanced (path-based, header-based, etc.) |
+| SSL Termination                | ❌ Not supported                         | ✅ Supported                               |
+| Caching / Auth / Rate Limiting | ❌ Not possible                          | ✅ Possible                                |
+| Complexity                     | Simple                                  | Complex                                   |
+| Use Cases                      | High-throughput, simple routing         | Web apps, APIs, microservices             |
+| Examples                       | AWS Network Load Balancer, HAProxy      | NGINX, AWS Application Load Balancer      |
