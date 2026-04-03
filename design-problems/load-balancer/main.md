@@ -320,6 +320,23 @@ Endpoint: `PUT /config/algorithm`
 5. **Health checking runs continuously**. The Health Checker monitors all backends and both LB nodes. When it detects Backend 3 is unhealthy, it notifies both LB nodes to stop routing traffic there.
 6. **Configuration is managed centrally**. The Config Manager stores configuration (backend lists, algorithms, health check settings) in the Config Store and pushes updates to all LB nodes.
 
+
+#### Component Summary
+| Component                 | What It Does                                          | Key Characteristics                                            |
+|---------------------------|-------------------------------------------------------|----------------------------------------------------------------|
+| **Virtual IP / DNS**      | Provides a stable entry point for clients             | Abstracts LB cluster, hides internal changes                   |
+| **LB Nodes**              | Accept incoming requests and route to backend servers | Stateless, horizontally scalable                               |
+| **Session Store (Redis)** | Stores sticky session mappings                        | Shared across LB nodes, enables session persistence            |
+| **Health Checker**        | Continuously monitors backend and LB health           | Runs in background, ensures only healthy nodes receive traffic |
+| **Config Manager**        | Manages LB configuration via APIs                     | Handles updates, validation, and distribution                  |
+| **Config Store**          | Persists configuration data                           | Distributed store (e.g., etcd, Consul, DB)                     |
+| **Backend Pool**          | Group of application servers handling requests        | Organized by service type, enables scaling & isolation         |
+
+---
+
+## Database Design
+
+
 ## Glossary
 
 ### Layer 4 vs Layer 7 Load Balancer
