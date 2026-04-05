@@ -465,6 +465,59 @@ Different type of databases have different requirements for speed, persistence a
 
 ### Health Checking Strategies
 
+-  Chosen health strategy affects how quickly you detect failures, how aggressively you mark servers unhealthy, and how smoothly you handle recovery.
+
+#### Types of Health Checks
+
+#### 1. TCP Health Check
+
+- Simplest
+- load balancer opens a TCP connection to the backend and immediately closes it. 
+- If the connection succeeds, the backend is considered healthy.
+
+```
+1. Open TCP connection to backend:8080
+2. Connection succeeds within timeout → HEALTHY
+3. Connection refused or timeout → UNHEALTHY
+```
+
+- Verifies: network connectivity + something listening on PORT
+- Does not verify: Application is actually working.
+  - Example - Application hung -> Accepting requests but never sending responses.
+
+#### 2. HTTP Health Check
+
+- sends an HTTP request and checks the response.
+
+```
+1. Send: GET /health HTTP/1.1
+2. Expect: 200 OK (within timeout)
+3. Any other response or timeout → UNHEALTHY
+```
+
+- `/health` endpoint to do meaningful checks
+  - Verify DB connectivity
+  - checks for required services reachability
+  - only returns 200 if service can actually handle requests
+
+#### 3. Custom Health Check
+
+- For complex scenarios: Run custom scripts that return success or failure.
+- Used when
+  - for checks that load balancer cannot access
+  - health determination requires complex logic
+  - integrating with legacy systems
+
+#### Graceful Degradation
+
+- When backend fails -> shouldn't immeditely drop all connections (mid flight requests are affected)
+- Plan: Connection Draining
+  - **Detection**: health Check fails
+  - **Draining**: Stop new requests + Allow existing connections (requests) to complete
+  - **Removal**: Fully remove backend from pool once existing complete
+  - **Recovery**: Add backend back to pool if it passes health checks >= threshold
+- This ensures users experience minimal disruption
+
 ## Glossary
 
 ### Layer 4 vs Layer 7 Load Balancer
