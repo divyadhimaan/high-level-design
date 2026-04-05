@@ -518,6 +518,33 @@ Different type of databases have different requirements for speed, persistence a
   - **Recovery**: Add backend back to pool if it passes health checks >= threshold
 - This ensures users experience minimal disruption
 
+
+---
+
+### Session Persistence (Sticky Sessions)
+
+ Problem
+- When the application is not stateless.
+- If user logs in to `Backend_1`, their state is stored in `Backend_1`'s memory
+- If next request goes to `Backend_2` -> they appear to be logged out.
+- This creates confusion and bad user experience 
+
+Solution: Sticky Sessions
+- requests from the same user consistently go to the same backend.
+
+#### Approach 1: Cookie Based Stickiness
+- most common and reliable approach for HTTP traffic.
+- load balancer injects a cookie that identifies which backend should handle the user's requests.
+
+![cookie-based-stickiness](images/cookie-based-stickiness.png)
+- Once user logs in - Browser to include cookie in all subsequent requests
+> Why Best option for HTTP requests
+> - Works reliably regardless of client IP changes (mobile users, corporate proxies)
+> - No shared state needed between load balancer nodes
+> - Cookie survives load balancer restarts
+> - Can include a signature to prevent tampering (token/id)
+
+
 ## Glossary
 
 ### Layer 4 vs Layer 7 Load Balancer
