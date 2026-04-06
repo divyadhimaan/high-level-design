@@ -544,8 +544,44 @@ Solution: Sticky Sessions
 > - Cookie survives load balancer restarts
 > - Can include a signature to prevent tampering (token/id)
 
+- Limitations
+  - If the specified backend is unhealthy, the load balancer must pick a new one (and update the cookie)
+  - Adds a small amount of overhead to read and potentially set cookies
 
-## Glossary
+#### Approach 2: Source IP Persistence
+
+- For non-HTTP traffic or when you cannot use cookies, you can route based on client IP address. 
+- This is essentially the IP Hash algorithm applied for persistence.
+
+- When to use?
+  - Each client has a unique, stable public IP 
+  - You need persistence for non-HTTP protocols 
+  - You cannot modify the application or client
+
+- When it breaks?
+  - Corporate NAT: Thousands of users behind one IP all go to the same backend
+  - Mobile users: IP changes as they move between networks
+  - IPv4 exhaustion: More clients share fewer IPs
+
+> Use IP-based persistence only when cookie-based is not an option.
+
+#### Approach 3: Externalized Session Store
+
+- The cleanest solution is to avoid the problem entirely by making your application stateless. 
+- Instead of storing session data in backend memory, store it in a shared session store like Redis.
+
+![img.png](images/centralized-session-store.png)
+
+> Why best long term solution?
+>  - No sticky sessions needed, the load balancer can use pure round robin or least connections
+>  - Backends can scale horizontally without concern for session affinity
+>  - Backend failures do not cause session loss (session is safe in Redis)
+>  - Simpler load balancer configuration
+
+- It can be a trade-off for legacy applications. As this approach requires significant refactoring
+- Always create new applications to be stateless.
+
+---
 
 ### Layer 4 vs Layer 7 Load Balancer
 | Aspect                         | Layer 4 Load Balancing                  | Layer 7 Load Balancing                    |
@@ -563,3 +599,64 @@ Solution: Sticky Sessions
 | Complexity                     | Simple                                  | Complex                                   |
 | Use Cases                      | High-throughput, simple routing         | Web apps, APIs, microservices             |
 | Examples                       | AWS Network Load Balancer, HAProxy      | NGINX, AWS Application Load Balancer      |
+
+
+---
+
+### SSL/TLS Termination
+
+Problem: 
+- Managing SSL certificates on every backend server is tedious and error-prone. 
+- You have dozens of servers, and each needs the certificate renewed before it expires.
+
+With SSL termination
+- the load balancer handles all the encryption, and backends receive plain HTTP.
+
+#### Why SSL helps
+- Simplified certificate management
+  - You install and renew certificates in one place (the load balancer) instead of on every backend server. 
+- Offload CPU from backends
+- SSL encryption and decryption are CPU-intensive operations. 
+- By terminating SSL at the load balancer, your backends can use their CPU for application logic instead of cryptography.
+- Enable content-based routing
+  - If you want to route based on URL path or headers, the load balancer needs to read the HTTP request. 
+  - It cannot do this if the traffic is encrypted end-to-end. 
+  - SSL termination gives the load balancer visibility into the request content.
+- TLS session caching
+  - The load balancer can cache TLS sessions, so clients reconnecting do not need to do a full TLS handshake every time. 
+  - This improves latency for repeat visitors.
+
+#### Security Implications
+
+- trade-off: connection between load balancer and backends is un-encrypted
+- No concerns:
+  - The load balancer and backends are in the same private network (e.g., a VPC)
+  - You trust the network infrastructure
+  - You have network-level security controls in place
+- If concerns:
+  - Re-encryption
+    - The load balancer decrypts client traffic, inspects it, then re-encrypts it before sending to the backend.
+    - gives content inspection plus backend encryption, but with double the cryptographic overhead.
+  - SSL Passthrough
+    - The load balancer does not decrypt traffic at all. 
+    - It routes based on the TLS Server Name Indication (SNI) and forwards encrypted packets directly to backends.
+    - You lose the ability to do content-based routing, but traffic is encrypted end-to-end.
+
+---
+
+### Handling Failures
+
+- The load balancer sits on the critical path for all traffic. 
+- If it fails and you do not have a backup, your entire service goes offline. 
+- This is why high availability is non-negotiable for production load balancers.
+
+#### Detection
+- **Heartbeat messages**: LB nodes exchange "I'm alive" messages every 1-3 seconds. If a node stops responding, it is presumed dead.
+- **Health checks**: The same health checking mechanism used for backends can monitor LB nodes.
+- **Shared storage heartbeats**: Write timestamps to a shared location (etcd, Redis) to detect liveness.
+
+> Note: The detection should be balanced 
+> - too sensitive and you get false positives (declaring a node dead when it just had a brief network hiccup)
+> - too slow and you extend your outage.
+
+
