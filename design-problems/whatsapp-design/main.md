@@ -153,11 +153,24 @@
   > _Key-value store_ is suitable.
 
 #### Why key-value store for chat data?
-- Easy horizontal scaling by sharding data across multiple nodes.
-- Very low latency for reads/writes.
-- Relational databases dont handle long chat histories well.
-- Adopted by facebook messenger (HBase) and discord (Cassandra).
+- When you design a chat system (WhatsApp, Slack, etc.), your primary workload is:
+  - high write throughput
+  - low-latency reads
+  - simple access patterns
+- Here key-value helps:
+  - Easy horizontal scaling by sharding data across multiple nodes.
+  - Very low latency for reads/writes.
+  - Relational databases dont handle long chat histories well.
+  - Adopted by facebook messenger (HBase) and discord (Cassandra).
 
+
+#### DB choice
+| Layer                | DB Choice        | Type                  | Purpose                              | Why This DB                                                      |
+|----------------------|------------------|-----------------------|--------------------------------------|------------------------------------------------------------------|
+| **Primary Storage**  | Apache Cassandra | Wide-column (NoSQL)   | Store chat messages                  | High write throughput, horizontal scaling, time-series optimized |
+| **Cache / Realtime** | Redis            | Key-Value (In-memory) | Recent chats, unread count, presence | Ultra-low latency, fast reads/writes                             |
+| **Search**           | Elasticsearch    | Search Engine         | Full-text search on messages         | Efficient indexing + search capabilities                         |
+| **Metadata**         | MySQL            | Relational DB         | Users, groups, relationships         | Strong consistency, structured queries                           |
 
 ---
 ### Data Model
