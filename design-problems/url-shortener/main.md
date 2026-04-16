@@ -260,7 +260,7 @@ click the alias, it redirects you to the original URL.
    requests based on IP address or other filtering rules. 
 2. Web server scaling: Since web tier is stateless, it is easy to scale by adding or removing web servers.
 3. Database Scaling: Database replication and sharding are common techniques.
-4. Availability: Use CSN to store mappings close to users globally.
+4. Availability: Use CDN to store mappings close to users globally.
 5. Analytics: Data is increasingly important for business success. Integrating an analytics
    solution to the URL shortener could help to answer important questions like how many
    people click on a link? When do they click the link? etc.
