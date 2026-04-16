@@ -42,7 +42,7 @@ click the alias, it redirects you to the original URL.
   - Assume average URL length is 100 characters. 
   - Each character takes 1 byte. 
   - Each URL mapping takes 200 bytes (100 bytes for long URL + 100 bytes for short URL). 
-  - Total storage over 10 years = 365 billion * 200 bytes * 10 years = 730 TB.
+  - Total storage over 10 years = 365 billion * 200 bytes  = 73 TB.
 ---
 ## Step 2: High-Level Design
 
