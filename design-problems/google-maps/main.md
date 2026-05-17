@@ -1,5 +1,39 @@
 # Location Based Service - Google Maps
 
+> Google Maps provide satellite imagery, street maps, real-time traffic conditions and route planning.
+> - It helps users find directions and navigate to the destination.
+
+
+## Step 1: Understanding problem statement
+
+> Candidate: What many daily active users?
+>
+> Interviewer: 1 billion DAU.
+
+> Candidate: Which features should we focus on? Direction, Navigation, ETA and map rendering?
+>
+> Interviewer: Focus on location update, navigation, ETA and map rendering(converting raw geographic data into visual image).
+
+> Candidate: How large is road data? Can we assume we have access to it?
+>
+> Interviewer: Lets assume we obtained the road data from different sources. It is terabytes (TBs) of data.
+
+> Candidate: Should we support different modes of travel like walking, driving, bus, etc?
+>
+> Interviewer: yes
+
+> Candidate: Should our system take traffic condition into consideration?
+>
+> Interviewer: yes, traffic conditions are very crucial for accurate calculation of ETA.
+
+> Candidate: Should it support multi stop directions?
+>
+> Interviewer: It is a good to have. Not right now
+
+> Candidate: what about business places and photos? How many photos are we expecting?
+>
+> Interviewer: Good question. But out of scope for now.
+
 ## Requirements
 
 - Finding the best route from a source to destination
