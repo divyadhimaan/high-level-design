@@ -34,13 +34,14 @@
 >
 > Interviewer: Good question. But out of scope for now.
 
-## Requirements
+### Requirements
 
 - Finding the best route from a source to destination
 - Adding Locations in the map
 - Finding Nearby Stores
 - Notifying users with traffic updates
 - Calculating the estimated time of arrival
+- Map rendering
 
 ### Good to have features 
 - Public Transport
@@ -49,6 +50,32 @@
 - Live Sharing permissions
 - Location history
   
+### NFEs
+
+- Accuracy: Users should not be given wrong directions
+- Smooth navigation: On client side, user should experience very smooth rendering
+- Data and Battery usage: client should use as little data and battery as possible.
+- Availability and Scalability
+
+## MAP 101
+
+### Positioning Systems
+- World is sphere.
+- Top: North Pole, Bottom: South Pole
+- Latitude: Denotes how far north or south
+- Longitude: Denotes how far east or west
+
+### 3D to 2D
+- The process of translating the points from a 3D globe to a 2D plane is called `Map Projection`
+- There are different ways of projections. Each comes with its pros and cons
+- Google uses a modified version of `Mercator projection` called `Web Mercator`
+
+### Geocoding
+
+- The process of converting address to geographic coordinates(LAT, LONG).
+- the conversion from latitude/longitude to actual human-readable address is called **reverse geocoding**.
+- One way to geocode is `interpolation`.
+- This method leverages the data from different sources such as geographic information systems (GIS) where the street network is mapped to geographic coordinate space.
 
 
 ## 1. Finding the best route from a source to destination
