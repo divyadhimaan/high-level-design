@@ -77,6 +77,10 @@
 - One way to geocode is `interpolation`.
 - This method leverages the data from different sources such as geographic information systems (GIS) where the street network is mapped to geographic coordinate space.
 
+### Geohashing
+
+- 
+
 
 ## 1. Finding the best route from a source to destination
 
